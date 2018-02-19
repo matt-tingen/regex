@@ -5,7 +5,8 @@ const Matcher = require('./Matcher');
 
 class Regex {
   constructor(pattern) {
-    const parser = new Parser(new TokenStream(new CharacterStream(pattern)));
+    const string = pattern instanceof RegExp ? pattern.source : pattern;
+    const parser = new Parser(new TokenStream(new CharacterStream(string)));
     this.ast = parser.parse();
   }
 

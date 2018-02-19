@@ -31,3 +31,8 @@ test('Regex is reusable', t => {
   t.false(regex.match('b'));
   t.true(regex.match('a'));
 });
+
+test('Accepts RegExp as constructor argument', t => {
+  const regex = new Regex(/a+/);
+  t.true(regex.match('aa'));
+});
