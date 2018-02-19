@@ -20,6 +20,7 @@ const regex = new Regex(/(ab)+[cd]?/);
 Supported features are:
 
 * Basic character matching
+* Dot e.g. `.+`
 * Repetition e.g.`a?b*c+`
 * Grouping e.g. `(abc)`
 * Character classes e.g. `[abc]`
@@ -28,5 +29,4 @@ All other regex features are not supported.
 Notable omissions are:
 
 * **Backtracking** e.g. `new Regex('a+a').match('aa')`
-* Dot (`.`)
 * Ranges in character classes (`[a-z]`)

@@ -9,6 +9,10 @@ const patterns = {
   '5': [ast.char('5')],
   ' ': [ast.char(' ')],
   abc: ast.str('abc'),
+  '.': [ast.dot()],
+  '..': [ast.dot(), ast.dot()],
+  '.+': [ast.rep(1, Infinity, ast.dot())],
+  '.*': [ast.rep(0, Infinity, ast.dot())],
   'a?': [ast.rep(0, 1, ast.char('a'))],
   'a*': [ast.rep(0, Infinity, ast.char('a'))],
   'a+': [ast.rep(1, Infinity, ast.char('a'))],
@@ -61,6 +65,31 @@ test(testMiss, 'b', 'a');
 test(testMatch, 'abc', 'abc');
 test(testMiss, 'ab', 'abc');
 test(testMiss, 'abcd', 'abc');
+
+test(testMatch, 'a', '.');
+test(testMatch, '.', '.');
+test(testMatch, '!', '.');
+test(testMatch, ' ', '.');
+test(testMiss, '', '.');
+test(testMiss, 'ab', '.');
+
+test(testMatch, 'aa', '..');
+test(testMatch, 'ab', '..');
+test(testMiss, '', '..');
+test(testMiss, 'a', '..');
+test(testMiss, 'abc', '..');
+
+test(testMatch, 'a', '.+');
+test(testMatch, 'ab', '.+');
+test(testMatch, 'abc', '.+');
+test(testMatch, 'aaaaaa', '.+');
+test(testMiss, '', '.+');
+
+test(testMatch, 'a', '.*');
+test(testMatch, 'ab', '.*');
+test(testMatch, 'abc', '.*');
+test(testMatch, 'aaaaaa', '.*');
+test(testMatch, '', '.*');
 
 test(testMatch, 'a', 'a?');
 test(testMatch, '', 'a?');

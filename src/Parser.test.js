@@ -24,6 +24,8 @@ parsingThrows.title = (providedTitle, input) => providedTitle || `Croaks on ${in
 test(testParsing, 'abc', ...ast.str('abc'));
 test(testParsing, '\\[abc\\]', ...ast.str('[abc]'));
 
+test(testParsing, '.', ast.dot());
+
 test(testParsing, '[a]', ast.class('a'));
 test(testParsing, '[abc]', ast.class('abc'));
 test(testParsing, '[a+]', ast.class('a+'));
@@ -34,6 +36,7 @@ test(testParsing, '[\\]]', ast.class(']'));
 test(testParsing, '(a)', ast.group(ast.char('a')));
 test(testParsing, '(abc)', ast.group(...ast.str('abc')));
 
+test(testParsing, '.?', ast.rep(0, 1, ast.dot()));
 test(testParsing, 'a?', ast.rep(0, 1, ast.char('a')));
 test(testParsing, 'a*', ast.rep(0, Infinity, ast.char('a')));
 test(testParsing, 'a+', ast.rep(1, Infinity, ast.char('a')));

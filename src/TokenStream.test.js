@@ -31,6 +31,7 @@ test(testTokenization, ')', 'punc');
 test(testTokenization, '+', 'punc');
 test(testTokenization, '*', 'punc');
 test(testTokenization, '?', 'punc');
+test(testTokenization, '.', 'punc');
 
 test(testTokenization, 'a', 'char');
 test(testTokenization, '4', 'char');
@@ -51,6 +52,7 @@ test('Allows escaping of non-escape character', testTokenization, `\\h`, 'char',
 
 test('Identifies escaped bracket', testTokenization, '\\[', 'char', '[');
 test('Identifies escaped plus', testTokenization, '\\+', 'char', '+');
+test('Identifies escaped dot', testTokenization, '\\.', 'char', '.');
 
 // Errors
 test.failing(tokenizationThrows, 'α'); // unicode is not supported

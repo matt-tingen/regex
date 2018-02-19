@@ -4,6 +4,7 @@ const ast = {
   group: (...values) => ({ type: 'group', values }),
   class: chars => ({ type: 'alt', values: ast.str(chars) }),
   rep: (min, max, value) => ({ type: 'rep', min, max, value }),
+  dot: () => ({ type: 'dot' }),
 };
 
 module.exports = {

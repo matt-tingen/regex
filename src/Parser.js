@@ -35,6 +35,8 @@ class Parser {
       expression = this.parseCharacterClass();
     } else if (value === '(') {
       expression = this.parseGroup();
+    } else if (value === '.') {
+      expression = this.parseDot();
     } else {
       this.croakInvalidPunctuation();
     }
@@ -84,7 +86,7 @@ class Parser {
   }
 
   parseCharacterClass() {
-    // Consume the opening bracket
+    // Consume the opening bracket.
     this.next();
 
     const chars = [];
@@ -100,7 +102,7 @@ class Parser {
       this.croak('Encountered empty character class.');
     }
 
-    // Consume the closing bracket
+    // Consume the closing bracket.
     this.next();
 
     const values = chars.map(value => ({ type: 'char', value }));
@@ -112,7 +114,7 @@ class Parser {
   }
 
   parseGroup() {
-    // Consume the opening parenthesis
+    // Consume the opening parenthesis.
     this.next();
 
     const values = [];
@@ -126,13 +128,20 @@ class Parser {
       this.croak('Encountered empty group.');
     }
 
-    // Consume the closing parenthesis
+    // Consume the closing parenthesis.
     this.next();
 
     return {
       type: 'group',
       values,
     };
+  }
+
+  parseDot() {
+    // Consume the dot.
+    this.next();
+
+    return { type: 'dot' };
   }
 
   peek() {

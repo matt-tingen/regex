@@ -2,10 +2,6 @@ class Matcher {
   constructor(ast, input) {
     this.ast = ast;
     this.fullInput = input;
-
-    this.parents = new Map();
-    this.parents.set(this.ast, null);
-    // this.node = this.ast;
     this.index = 0;
 
     this.matchNode = this.matchNode.bind(this);
@@ -43,8 +39,15 @@ class Matcher {
       return this.matchRepetition(node);
     } else if (type === 'alt') {
       return this.matchAlternation(node);
+    } else if (type === 'dot') {
+      return this.matchDot();
     } else {
     }
+  }
+
+  matchDot() {
+    this.index++;
+    return true;
   }
 
   matchChar({ value }) {
