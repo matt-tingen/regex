@@ -10,11 +10,11 @@ class Parser {
   }
 
   parse() {
-    const sequence = [];
+    const values = [];
     while (!this.eof()) {
-      sequence.push(this.parseExpression());
+      values.push(this.parseExpression());
     }
-    return { type: 'seq', values: sequence };
+    return { type: 'group', values };
   }
 
   peekType() {
@@ -127,7 +127,7 @@ class Parser {
 
     return {
       type: 'group',
-      body: { type: 'seq', values },
+      values,
     };
   }
 

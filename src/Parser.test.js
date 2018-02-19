@@ -10,8 +10,8 @@ const parserFromString = input => new Parser(new TokenStream(new CharacterStream
 
 function testParsing(t, input, ...nodes) {
   const parser = parserFromString(input);
-  const sequence = ast.seq(...nodes);
-  t.deepEqual(parser.parse(), sequence);
+  const root = ast.group(...nodes);
+  t.deepEqual(parser.parse(), root);
 }
 testParsing.title = (providedTitle, input, type) => providedTitle || `Parses ${input}`;
 

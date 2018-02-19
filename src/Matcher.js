@@ -33,9 +33,7 @@ class Matcher {
 
   matchNode(node) {
     const { type } = node;
-    if (type === 'seq') {
-      return this.matchSequence(node);
-    } else if (type === 'group') {
+    if (type === 'group') {
       return this.matchGroup(node);
     } else if (this.eof() && !this.isOptional(node)) {
       return false;
@@ -70,17 +68,13 @@ class Matcher {
     return repeats >= min;
   }
 
-  matchSequence({ values }) {
-    return values.every(this.matchNode);
-  }
-
   matchAlternation({ values }) {
     return values.some(this.matchNode);
   }
 
-  matchGroup({ body }) {
+  matchGroup({ values }) {
     const bookmark = this.index;
-    const match = this.matchSequence(body);
+    const match = values.every(this.matchNode);
 
     if (!match) {
       this.backtrack(bookmark);

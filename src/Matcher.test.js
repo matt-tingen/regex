@@ -33,8 +33,8 @@ function checkPattern(input, pattern) {
   if (!nodes) {
     throw new Error('Invalid testing pattern');
   }
-  const sequence = ast.seq(...nodes);
-  const matcher = new Matcher(sequence, input);
+  const root = ast.group(...nodes);
+  const matcher = new Matcher(root, input);
   return matcher.match();
 }
 
