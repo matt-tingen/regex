@@ -4,7 +4,8 @@ class TokenStream {
     this.token = null;
 
     this.escape = '\\';
-    this.punctuation = ['[', ']', '(', ')', '+', '*', '?'];
+    this.punctuation = ['[', ']', '(', ')'];
+    this.repetition = ['+', '*', '?'];
 
     this.escaped = {
       n: '\n',
@@ -21,7 +22,7 @@ class TokenStream {
     if (this.chars.eof()) {
       return null;
     }
-    return this.checkPunctuation() || this.checkChar();
+    return this.checkPunctuation() || this.checkRepetition() || this.checkChar();
   }
 
   getFromEscapedChar(escaped) {
@@ -42,6 +43,13 @@ class TokenStream {
   checkPunctuation() {
     if (this.punctuation.includes(this.chars.peek())) {
       return { type: 'punc', value: this.chars.next() };
+    }
+    return null;
+  }
+
+  checkRepetition() {
+    if (this.repetition.includes(this.chars.peek())) {
+      return { type: 'rep', value: this.chars.next() };
     }
     return null;
   }
