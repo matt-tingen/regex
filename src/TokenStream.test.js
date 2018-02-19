@@ -32,25 +32,25 @@ test(testTokenization, '+', 'punc');
 test(testTokenization, '*', 'punc');
 test(testTokenization, '?', 'punc');
 
-test(testTokenization, 'a', 'str');
-test(testTokenization, 'abc', 'str');
-test(testTokenization, '123', 'str');
-test(testTokenization, 'this is a string', 'str');
-test(testTokenization, '!# -=', 'str');
+test(testTokenization, 'a', 'char');
+test(testTokenization, '4', 'char');
+test(testTokenization, '!', 'char');
+test(testTokenization, '=', 'char');
+test(testTokenization, ' ', 'char');
 
 // String Escapes
-test('Identifies new line', testTokenization, '\\n', 'str', '\n');
-test('Identifies carriage return', testTokenization, '\\r', 'str', '\r');
-test('Identifies tab', testTokenization, '\\t', 'str', '\t');
-test('Identifies backspace', testTokenization, '\\b', 'str', '\b');
-test('Identifies form feed', testTokenization, '\\f', 'str', '\f');
-test('Identifies vertical tab', testTokenization, '\\v', 'str', '\v');
-test('Identifies null char', testTokenization, '\\0', 'str', '\0');
-test('Identifies escaped slash', testTokenization, '\\\\', 'str', '\\');
-test('Allows escaping of non-escape character', testTokenization, `\\h`, 'str', `h`);
+test('Identifies new line', testTokenization, '\\n', 'char', '\n');
+test('Identifies carriage return', testTokenization, '\\r', 'char', '\r');
+test('Identifies tab', testTokenization, '\\t', 'char', '\t');
+test('Identifies backspace', testTokenization, '\\b', 'char', '\b');
+test('Identifies form feed', testTokenization, '\\f', 'char', '\f');
+test('Identifies vertical tab', testTokenization, '\\v', 'char', '\v');
+test('Identifies null char', testTokenization, '\\0', 'char', '\0');
+test('Identifies escaped slash', testTokenization, '\\\\', 'char', '\\');
+test('Allows escaping of non-escape character', testTokenization, `\\h`, 'char', `h`);
 
-test('Identifies escaped bracket', testTokenization, '\\[', 'str', '[');
-test('Identifies escaped plus', testTokenization, '\\+', 'str', '+');
+test('Identifies escaped bracket', testTokenization, '\\[', 'char', '[');
+test('Identifies escaped plus', testTokenization, '\\+', 'char', '+');
 
 // Errors
 test.failing(tokenizationThrows, 'α'); // unicode is not supported
@@ -98,7 +98,7 @@ test('provides meaningful message on empty escape', t => {
 test('next advances index', t => {
   const tokens = tokenStreamFromString('[abc]');
   t.deepEqual(tokens.next(), { type: 'punc', value: '[' });
-  t.deepEqual(tokens.next(), { type: 'str', value: 'abc' });
+  t.deepEqual(tokens.next(), { type: 'char', value: 'a' });
 });
 
 test('peek does not advance index', t => {

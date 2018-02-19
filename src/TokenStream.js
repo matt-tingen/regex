@@ -21,63 +21,26 @@ class TokenStream {
     if (this.chars.eof()) {
       return null;
     }
-    return this.checkPunctuation() || this.checkString() || this.croakInvalidChar();
-  }
-
-  tokenFromBuffer(buffer, type) {
-    return {
-      type,
-      value: buffer.join(''),
-    };
-  }
-
-  atWordEnd() {
-    return this.chars.eof() || this.chars.peek().match(this.whiteSpace);
-  }
-
-  croakInvalidChar(expectation) {
-    const found = `"${this.chars.peek()}"`;
-    const message = expectation
-      ? `Expected ${expectation}, found ${found}.`
-      : `Encountered unexpected character ${found}.`;
-    this.croak(message);
+    return this.checkPunctuation() || this.checkChar();
   }
 
   getFromEscapedChar(escaped) {
     return this.escaped[escaped] || escaped;
   }
 
-  checkString() {
-    const buffer = [];
-    let escapeNext = false;
-    while (!this.eof() && (escapeNext || !this.peekPunctuation())) {
-      const raw = this.chars.next();
-      let char;
-      if (escapeNext) {
-        char = this.getFromEscapedChar(raw);
-        escapeNext = false;
-      } else if (raw === this.escape) {
-        char = null;
-        escapeNext = true;
-      } else {
-        char = raw;
-      }
-      if (char) {
-        buffer.push(char);
-      }
-    }
-    if (this.eof() && escapeNext) {
+  checkChar() {
+    const raw = this.chars.next();
+    const isEscape = raw === this.escape;
+    if (this.eof() && isEscape) {
       this.croak('Empty escape encountered');
     }
-    return this.tokenFromBuffer(buffer, 'str');
-  }
+    const char = isEscape ? this.getFromEscapedChar(this.chars.next()) : raw;
 
-  peekPunctuation() {
-    return this.punctuation.includes(this.chars.peek());
+    return { type: 'char', value: char };
   }
 
   checkPunctuation() {
-    if (this.peekPunctuation()) {
+    if (this.punctuation.includes(this.chars.peek())) {
       return { type: 'punc', value: this.chars.next() };
     }
     return null;
