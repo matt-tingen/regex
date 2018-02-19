@@ -1,5 +1,5 @@
 const test = require('ava');
-const CharacterStream = require('./CharacterStream.js');
+const CharacterStream = require('./CharacterStream');
 
 const advance = (stream, n) => {
   for (let i = 0; i < n; i++) {

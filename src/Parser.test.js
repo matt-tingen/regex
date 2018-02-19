@@ -1,19 +1,11 @@
 const test = require('ava');
 const sinon = require('sinon');
-const CharacterStream = require('./CharacterStream.js');
-const TokenStream = require('./TokenStream.js');
-const Parser = require('./Parser.js');
+const CharacterStream = require('./CharacterStream');
+const TokenStream = require('./TokenStream');
+const Parser = require('./Parser');
+const { ast } = require('./testUtil');
 
 // Macros / Helpers
-const ast = {
-  char: value => ({ type: 'char', value }),
-  str: chars => chars.split('').map(ast.char),
-  group: (...bodyNodes) => ({ type: 'group', body: ast.seq(...bodyNodes) }),
-  class: chars => ({ type: 'alt', values: ast.str(chars) }),
-  seq: (...values) => ({ type: 'seq', values }),
-  rep: (min, max, value) => ({ type: 'rep', min, max, value }),
-};
-
 const parserFromString = input => new Parser(new TokenStream(new CharacterStream(input)));
 
 function testParsing(t, input, ...nodes) {

@@ -1,7 +1,7 @@
 const test = require('ava');
 const sinon = require('sinon');
-const TokenStream = require('./TokenStream.js');
-const CharacterStream = require('./CharacterStream.js');
+const TokenStream = require('./TokenStream');
+const CharacterStream = require('./CharacterStream');
 
 // Macros / Helpers
 const tokenStreamFromString = input => new TokenStream(new CharacterStream(input));
