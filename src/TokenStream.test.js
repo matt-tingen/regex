@@ -136,6 +136,7 @@ test('next after peek is short-cutted', t => {
   const tokens = tokenStreamFromString('[');
   sinon.spy(tokens, 'checkPunctuation');
   tokens.peek();
+  t.false(tokens.eof());
   tokens.next();
   t.true(tokens.checkPunctuation.calledOnce);
 });

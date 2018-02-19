@@ -59,7 +59,7 @@ class TokenStream {
   }
 
   eof() {
-    return this.chars.eof();
+    return !this.token && this.chars.eof();
   }
 
   croak(msg) {
