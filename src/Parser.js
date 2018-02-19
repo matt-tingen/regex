@@ -21,6 +21,10 @@ class Parser {
     return this.peek().type;
   }
 
+  isRepeat({ type, value }) {
+    return type === 'punc' && value in repeatData;
+  }
+
   parseExpression() {
     const { type, value } = this.peek();
     let expression;
@@ -35,7 +39,7 @@ class Parser {
       this.croakInvalidPunctuation();
     }
 
-    if (!this.eof() && this.peekType() === 'rep') {
+    if (!this.eof() && this.isRepeat(this.peek())) {
       expression = this.parseRepeat(expression);
     }
 

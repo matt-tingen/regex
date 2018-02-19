@@ -28,10 +28,9 @@ test(testTokenization, '[', 'punc');
 test(testTokenization, ']', 'punc');
 test(testTokenization, '(', 'punc');
 test(testTokenization, ')', 'punc');
-
-test(testTokenization, '+', 'rep');
-test(testTokenization, '*', 'rep');
-test(testTokenization, '?', 'rep');
+test(testTokenization, '+', 'punc');
+test(testTokenization, '*', 'punc');
+test(testTokenization, '?', 'punc');
 
 test(testTokenization, 'a', 'char');
 test(testTokenization, '4', 'char');
