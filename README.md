@@ -26,4 +26,4 @@ Supported features are:
 * Character classes e.g. `[abc]`
 
 All other regex features are not supported.
-The most notable omissions is backtracking e.g. `new Regex('a+a').match('aa')`.
+The most notable omission is backtracking. For example, `new Regex('a+a').match('aa')` yields a false-negative.
