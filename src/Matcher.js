@@ -44,6 +44,7 @@ class Matcher {
     } else if (type === 'dot') {
       return this.matchDot();
     } else {
+      this.croak('Encountered unknown node type "${type}".');
     }
   }
 
