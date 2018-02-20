@@ -6,10 +6,15 @@
   "author": "Matt Tingen <matt.tingen@gmail.com>",
   "devDependencies": {
     "ava": "^0.25.0",
+    "nyc": "^11.4.1",
     "sinon": "^4.3.0"
   },
   "scripts": {
     "test": "ava",
+    "test:coverage": "nyc yarn test",
     "test:watch": "yarn test --watch"
+  },
+  "nyc": {
+    "exclude": ["src/testUtil.js", "**/*.test.js"]
   }
 }
