@@ -17,10 +17,6 @@ class Parser {
     return { type: 'group', values };
   }
 
-  peekType() {
-    return this.peek().type;
-  }
-
   isRepeat({ type, value }) {
     return type === 'punc' && value in repeatData;
   }
