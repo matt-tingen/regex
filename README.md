@@ -3,16 +3,17 @@ This is a basic regular expression engine. It currently supports only a handful 
 # Usage
 
 ```js
-const regex = new Regex('(ab)+[cd]?');
-regex.match('abc'); // true
-regex.match('abcd'); // false
+const float = new Regex('[0-9]*\\.[0-9]+');
+float.match('3.50'); // true
+float.match('42'); // false
 ```
 
-You can also use a RegExp literal as the source pattern.
-This is primarily useful for syntax highlighting.
+You can also use a `RegExp` literal as the source pattern.
+This is primarily useful for syntax highlighting and escapes.
+However, when doing this, errors in the pattern will be thrown by `RegExp` rather than `Regex`.
 
 ```js
-const regex = new Regex(/(ab)+[cd]?/);
+new Regex(/[0-9]*\.[0-9]+/);
 ```
 
 # Features
