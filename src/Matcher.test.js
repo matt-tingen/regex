@@ -153,6 +153,7 @@ test(testMiss, '~', '[0a-z]');
 
 test(testMatch, 'a', '(a)');
 test(testMatch, 'abc', '(abc)');
+test(testMiss, '', '(a)');
 
 test(testMatch, 'a', '[abc]?');
 test(testMatch, 'b', '[abc]?');
