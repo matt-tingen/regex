@@ -2,9 +2,11 @@ const ast = {
   char: value => ({ type: 'char', value }),
   str: chars => chars.split('').map(ast.char),
   group: (...values) => ({ type: 'group', values }),
-  class: chars => ({ type: 'alt', values: ast.str(chars) }),
+  alt: (...values) => ({ type: 'alt', values }),
+  class: chars => ast.alt(...ast.str(chars)),
   rep: (min, max, value) => ({ type: 'rep', min, max, value }),
   dot: () => ({ type: 'dot' }),
+  range: (from, to) => ({ type: 'range', from, to }),
 };
 
 module.exports = {

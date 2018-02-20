@@ -85,27 +85,61 @@ class Parser {
     return token.type === 'punc' && token.value === value;
   }
 
+  validateRange({ from, to }) {
+    if (from.charCodeAt(0) >= to.charCodeAt(0)) {
+      this.croak('Encountered non-positive length character range.');
+    }
+  }
+
   parseCharacterClass() {
     // Consume the opening bracket.
     this.next();
 
-    const chars = [];
+    const values = [];
+    let prev = null;
 
-    // Until the character class is closed, punctuation other than a closing bracket is demoted to a
-    // regular character.
     while (!this.eof() && !this.comparePeek(']')) {
-      chars.push(this.next().value);
+      if (prev && prev.type === 'char' && this.comparePeek('-')) {
+        prev = { type: 'range', from: prev.value };
+        // Consume the dash.
+        this.next();
+      } else {
+        const { value } = this.next();
+
+        if (prev && prev.type === 'range') {
+          prev.to = value;
+          this.validateRange(prev);
+          values.push(prev);
+          prev = null;
+        } else {
+          if (prev) {
+            values.push(prev);
+          }
+
+          // Within a character class, punctuation other than closing bracket and significant dashes
+          // are demoted to a regular characters.
+          prev = { type: 'char', value };
+        }
+      }
     }
+
+    if (prev) {
+      if (prev.type === 'range') {
+        values.push({ type: 'char', value: prev.from });
+        values.push({ type: 'char', value: '-' });
+      } else {
+        values.push(prev);
+      }
+    }
+
     if (this.eof()) {
       this.croakUnexpectedEnd(']');
-    } else if (!chars.length) {
+    } else if (!values.length) {
       this.croak('Encountered empty character class.');
     }
 
     // Consume the closing bracket.
     this.next();
-
-    const values = chars.map(value => ({ type: 'char', value }));
 
     return {
       type: 'alt',

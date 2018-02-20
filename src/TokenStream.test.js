@@ -32,6 +32,7 @@ test(testTokenization, '+', 'punc');
 test(testTokenization, '*', 'punc');
 test(testTokenization, '?', 'punc');
 test(testTokenization, '.', 'punc');
+test(testTokenization, '-', 'punc');
 
 test(testTokenization, 'a', 'char');
 test(testTokenization, '4', 'char');

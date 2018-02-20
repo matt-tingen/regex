@@ -32,6 +32,17 @@ test(testParsing, '[a+]', ast.class('a+'));
 test(testParsing, '[(a)]', ast.class('(a)'));
 test(testParsing, '[[]', ast.class('['));
 test(testParsing, '[\\]]', ast.class(']'));
+test(testParsing, '[-]', ast.class('-'));
+test(testParsing, '[abc-]', ast.class('abc-'));
+test(testParsing, '[-abc]', ast.class('-abc'));
+
+test(testParsing, '[a-z]', ast.alt(ast.range('a', 'z')));
+test(testParsing, '[0-9]', ast.alt(ast.range('0', '9')));
+test(testParsing, '[a0-9b]', ast.alt(ast.char('a'), ast.range('0', '9'), ast.char('b')));
+test(testParsing, '[a-z0-9]', ast.alt(ast.range('a', 'z'), ast.range('0', '9')));
+test(testParsing, '[ --]', ast.alt(ast.range(' ', '-')));
+test(testParsing, '[ --a]', ast.alt(ast.range(' ', '-'), ast.char('a')));
+test(testParsing, '[ -~]', ast.alt(ast.range(' ', '~')));
 
 test(testParsing, '(a)', ast.group(ast.char('a')));
 test(testParsing, '(abc)', ast.group(...ast.str('abc')));
@@ -55,6 +66,10 @@ test(parsingThrows, '[');
 test(parsingThrows, '(abc');
 test(parsingThrows, '[abc');
 test(parsingThrows, '[]');
+test(parsingThrows, '[z-a]');
+test(parsingThrows, '[a-a]');
 test(parsingThrows, '()');
 test(parsingThrows, '+');
 test(parsingThrows, 'c++');
+
+// TODO: assertions about error messages

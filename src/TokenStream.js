@@ -4,7 +4,7 @@ class TokenStream {
     this.token = null;
 
     this.escape = '\\';
-    this.punctuation = ['[', ']', '(', ')', '+', '*', '?', '.'];
+    this.punctuation = ['[', ']', '(', ')', '+', '*', '?', '.', '-'];
 
     this.escaped = {
       n: '\n',

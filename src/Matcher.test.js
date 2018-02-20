@@ -18,6 +18,9 @@ const patterns = {
   'a+': [ast.rep(1, Infinity, ast.char('a'))],
   'abc?': [...ast.str('ab'), ast.rep(0, 1, ast.char('c'))],
   '[abc]': [ast.class('abc')],
+  '[a-z]': [ast.alt(ast.range('a', 'z'))],
+  '[0-9a-z]': [ast.alt(ast.range('0', '9'), ast.range('a', 'z'))],
+  '[0a-z]': [ast.alt(ast.char('0'), ast.range('a', 'z'))],
   'a*b': [ast.rep(0, Infinity, ast.char('a')), ast.char('b')],
   '(abc)?': [ast.rep(0, 1, ast.group(...ast.str('abc')))],
   '[abc]?': [ast.rep(0, 1, ast.class('abc'))],
@@ -115,7 +118,38 @@ test(testMiss, 'a', 'abc?');
 test(testMatch, 'a', '[abc]');
 test(testMatch, 'b', '[abc]');
 test(testMatch, 'c', '[abc]');
+test(testMiss, '', '[abc]');
 test(testMiss, 'd', '[abc]');
+
+test(testMatch, 'a', '[a-z]');
+test(testMatch, 'z', '[a-z]');
+test(testMatch, 'd', '[a-z]');
+test(testMiss, '', '[a-z]');
+test(testMiss, 'A', '[a-z]');
+test(testMiss, ' ', '[a-z]');
+test(testMiss, '~', '[a-z]');
+
+test(testMatch, 'a', '[0-9a-z]');
+test(testMatch, 'z', '[0-9a-z]');
+test(testMatch, '0', '[0-9a-z]');
+test(testMatch, '9', '[0-9a-z]');
+test(testMatch, 'd', '[0-9a-z]');
+test(testMatch, '4', '[0-9a-z]');
+test(testMiss, '', '[0-9a-z]');
+test(testMiss, 'A', '[0-9a-z]');
+test(testMiss, ' ', '[0-9a-z]');
+test(testMiss, '~', '[0-9a-z]');
+
+test(testMatch, 'a', '[0a-z]');
+test(testMatch, 'z', '[0a-z]');
+test(testMatch, '0', '[0a-z]');
+test(testMatch, 'd', '[0a-z]');
+test(testMiss, '', '[0a-z]');
+test(testMiss, '9', '[0a-z]');
+test(testMiss, '4', '[0a-z]');
+test(testMiss, 'A', '[0a-z]');
+test(testMiss, ' ', '[0a-z]');
+test(testMiss, '~', '[0a-z]');
 
 test(testMatch, 'a', '(a)');
 test(testMatch, 'abc', '(abc)');

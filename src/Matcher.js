@@ -35,6 +35,8 @@ class Matcher {
       return false;
     } else if (type === 'char') {
       return this.matchChar(node);
+    } else if (type === 'range') {
+      return this.matchRange(node);
     } else if (type === 'rep') {
       return this.matchRepetition(node);
     } else if (type === 'alt') {
@@ -52,6 +54,15 @@ class Matcher {
 
   matchChar({ value }) {
     const match = this.input[0] === value;
+    if (match) {
+      this.index++;
+    }
+    return match;
+  }
+
+  matchRange({ from, to }) {
+    const code = this.input[0].charCodeAt(0);
+    const match = from.charCodeAt(0) <= code && code <= to.charCodeAt(0);
     if (match) {
       this.index++;
     }
