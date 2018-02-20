@@ -104,6 +104,12 @@ test('next advances index', t => {
   t.deepEqual(tokens.next(), { type: 'char', value: 'a' });
 });
 
+test('next returns null after eof', t => {
+  const tokens = tokenStreamFromString('a');
+  tokens.next();
+  t.is(tokens.next(), null);
+});
+
 test('peek does not advance index', t => {
   const tokens = tokenStreamFromString('[abc]');
   t.deepEqual(tokens.peek(), { type: 'punc', value: '[' });

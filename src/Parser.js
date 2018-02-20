@@ -44,11 +44,9 @@ class Parser {
     return expression;
   }
 
-  croakInvalidPunctuation(expectation) {
+  croakInvalidPunctuation() {
     const found = `"${this.peek().value}"`;
-    const message = expectation
-      ? `Expected ${expectation}, found ${found}.`
-      : `Encountered unexpected character ${found}.`;
+    const message = `Encountered unexpected character ${found}.`;
     this.croak(message);
   }
 
