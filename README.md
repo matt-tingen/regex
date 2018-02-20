@@ -25,6 +25,7 @@ Supported features are:
 * Repetition e.g.`a?b*c+`
 * Grouping e.g. `(abc)`
 * Character classes e.g. `[abc]`
+* Character ranges e.g. `[a-z]`
 
 All other regex features are not supported.
 The most notable omission is backtracking. For example, `new Regex('a+a').match('aa')` yields a false-negative.
