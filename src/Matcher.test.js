@@ -206,5 +206,6 @@ test('Croaks on invalid node', t => {
 });
 
 // Backtracking
-test.failing(testMatch, 'aa', 'a+a');
-test.failing(testMatch, 'aa', 'a*aa');
+test.only(testMatch, 'aa', 'a+a');
+// test.failing(testMatch, 'aa', 'a*aa');
+// test.failing(testMatch, '1', '([0-9]*\\.)?[0-9]+');

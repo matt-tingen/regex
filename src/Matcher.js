@@ -4,6 +4,7 @@ class Matcher {
     this.fullInput = input;
     this.index = 0;
 
+    this.stack = [];
     this.matchNode = this.matchNode.bind(this);
   }
 
@@ -19,9 +20,26 @@ class Matcher {
     return this.index === this.fullInput.length;
   }
 
-  backtrack(destination) {
-    this.index = destination;
-  }
+  // bookmark() {
+  //   const previous = this.index;
+  //   return () => {
+  //     this.index = previous;
+  //   };
+  // }
+
+  // consume(node) {
+  //   this.pushState(node);
+  //   this.index++;
+  // }
+
+  // pushState(node) {
+  //   const revert = this.bookmark();
+  //   this.stack.push({ node, revert });
+  // }
+
+  // backtrack() {
+  //   return this.stack.pop() || null;
+  // }
 
   match() {
     return this.matchNode(this.ast) && this.eof();
@@ -31,75 +49,163 @@ class Matcher {
     return node.type === 'rep' && node.min === 0;
   }
 
-  matchNode(node) {
+  matchNode(node, meta) {
+    return this.processNode(node, meta).match;
+  }
+
+  processNode(node, meta) {
+    console.log('\nprocess', node, meta);
+    const matchers = {
+      group: this.matchGroup,
+      char: this.matchChar,
+      range: this.matchRange,
+      rep: this.matchRepetition,
+      alt: this.matchAlternation,
+      dot: this.matchDot,
+    };
     const { type } = node;
-    if (type === 'group') {
-      return this.matchGroup(node);
-    } else if (this.eof() && !this.isOptional(node)) {
-      return false;
-    } else if (type === 'char') {
-      return this.matchChar(node);
-    } else if (type === 'range') {
-      return this.matchRange(node);
-    } else if (type === 'rep') {
-      return this.matchRepetition(node);
-    } else if (type === 'alt') {
-      return this.matchAlternation(node);
-    } else if (type === 'dot') {
-      return this.matchDot();
-    } else {
+    const matcher = matchers[type];
+    if (!matcher) {
       this.croak('Encountered unknown node type "${type}".');
     }
+
+    return matcher.call(this, node, meta);
   }
 
   matchDot() {
+    if (this.eof()) {
+      return { match: false };
+    }
     this.index++;
-    return true;
+    return {
+      match: true,
+      flexible: false,
+    };
   }
 
   matchChar({ value }) {
+    if (this.eof()) {
+      return { match: false };
+    }
     const match = this.input[0] === value;
     if (match) {
       this.index++;
     }
-    return match;
+    return {
+      match,
+      flexible: false,
+    };
   }
 
   matchRange({ from, to }) {
+    if (this.eof()) {
+      return { match: false };
+    }
     const code = this.input[0].charCodeAt(0);
     const match = from.charCodeAt(0) <= code && code <= to.charCodeAt(0);
     if (match) {
       this.index++;
     }
-    return match;
+    return {
+      match,
+      flexible: false,
+    };
   }
 
-  matchRepetition({ min, max, value }) {
-    let repeats = 0;
-    let match = true;
-    while (match && !this.eof() && repeats !== max) {
-      match = this.matchNode(value);
-      if (match) {
-        repeats++;
+  matchRepetition({ min, max, value }, meta) {
+    let count = 0;
+    let lastRepeatMatched = true;
+    let effectiveMax = max;
+    if (meta) {
+      effectiveMax = meta.count - 1;
+      this.index--;
+    }
+    let foo = 0;
+    console.log(effectiveMax, meta, this.input.length);
+    while (lastRepeatMatched && !this.eof() && count !== effectiveMax) {
+      if (++foo > 20) throw new Error('inf loop');
+
+      lastRepeatMatched = this.matchNode(value);
+      if (lastRepeatMatched) {
+        count++;
       }
     }
 
-    return repeats >= min;
+    return {
+      match: count >= min,
+      flexible: count > min,
+      meta: { count },
+    };
   }
 
   matchAlternation({ values }) {
-    return values.some(this.matchNode);
+    const match = values.some(this.matchNode);
+    // TODO: should be flexible unless last value matched
+    return {
+      match,
+      flexible: false,
+    };
   }
 
   matchGroup({ values }) {
-    const bookmark = this.index;
-    const match = values.every(this.matchNode);
+    let allGood;
+    let done = false;
+    const metaMap = new Map();
+    const indexStateStack = [this.index];
 
-    if (!match) {
-      this.backtrack(bookmark);
+    let i = 0;
+    let baseIndex = 0; // All nodes below this index are inflexible.
+    let foo = 0;
+    while (!done) {
+      if (++foo > 20) throw new Error('inf loop');
+
+      const node = values[i];
+      const isLast = i === values.length - 1;
+      const { match, meta, flexible } = this.processNode(node, metaMap.get(node));
+      console.log(i, match, flexible, meta);
+
+      if (meta) {
+        metaMap.set(node, meta);
+      }
+
+      if (match) {
+        if (i === baseIndex && !flexible) {
+          baseIndex++;
+        }
+
+        if (isLast) {
+          done = true;
+          allGood = true;
+        } else {
+          i++;
+          indexStateStack.push(this.index);
+        }
+      } else {
+        console.log(isLast, baseIndex, i);
+
+        if (baseIndex === i) {
+          done = true;
+          allGood = false;
+        } else {
+          i--;
+          console.log('prepop', indexStateStack, this.index);
+          this.index = indexStateStack.pop();
+          console.log('postpop', indexStateStack, this.index);
+          // TODO NEXT: Need to also undo any of `this.index` that was incremented/consumed. Maybe
+          // make bookmarks for each node, store it in a map if the node is flexible. Map value
+          // would need to be a stack in case a node has to be backtracked to multiple times.
+        }
+      }
     }
 
-    return match;
+    if (!allGood) {
+      this.index = indexStateStack[0];
+    }
+
+    return {
+      match: allGood,
+      flexible: false,
+    };
   }
 }
 
