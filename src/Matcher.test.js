@@ -33,9 +33,22 @@ const patterns = {
   '(ab+)*': [ast.rep(0, Infinity, ast.group(ast.char('a'), ast.rep(1, Infinity, ast.char('b'))))],
   'a+a': [ast.rep(1, Infinity, ast.char('a')), ast.char('a')],
   'a*aa': [ast.rep(0, Infinity, ast.char('a')), ...ast.str('aa')],
+  'a+a+': [ast.rep(1, Infinity, ast.char('a')), ast.rep(1, Infinity, ast.char('a'))],
+  '(ab+)+(bc)+': [
+    ast.rep(1, Infinity, ast.group(ast.char('a'), ast.rep(1, Infinity, ast.char('b')))),
+    ast.rep(1, Infinity, ast.group(ast.char('b'), ast.char('c'))),
+  ],
   '([0-9]*\\.)?[0-9]+': [
     ast.rep(0, 1, ast.group(ast.rep(0, Infinity, ast.range('0', '9')), ast.char('.'))),
     ast.rep(1, Infinity, ast.range('0', '9')),
+  ],
+  '(a+a+)+b': [
+    ast.rep(
+      1,
+      Infinity,
+      ast.group(ast.rep(1, Infinity, ast.char('a')), ast.rep(1, Infinity, ast.char('a'))),
+    ),
+    ast.char('b'),
   ],
 };
 
@@ -212,4 +225,15 @@ test('Croaks on invalid node', t => {
 // Backtracking
 test(testMatch, 'aa', 'a+a');
 test(testMatch, 'aa', 'a*aa');
+test(testMatch, 'aa', 'a+a+');
+test(testMatch, 'aab', '(a+c)?a+b')
+test(testMatch, 'ababbc', '(ab+)+(bc)+');
 test(testMatch, '1', '([0-9]*\\.)?[0-9]+');
+test(testMatch, '1.50', '([0-9]*\\.)?[0-9]+');
+test(testMatch, '.50', '([0-9]*\\.)?[0-9]+');
+test(testMatch, 'aaaaab', '(a+a+)+b');
+test(testMatch, 'a', 'a+a+');
+test(testMiss, '1.2.3', '([0-9]*\\.)?[0-9]+');
+test(testMiss, 'aaaaa', '(a+a+)+b');
+test(testMatch, 'aab', '(a+c)a+b')
+

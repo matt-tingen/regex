@@ -12,6 +12,10 @@ class Matcher {
     return this.fullInput.slice(this.index);
   }
 
+  get matchedInput() {
+    return this.fullInput.slice(0, this.index);
+  }
+
   croak(msg) {
     throw new Error(msg);
   }
@@ -54,7 +58,6 @@ class Matcher {
   }
 
   processNode(node, meta) {
-    // console.log('\nprocess', this.input || "''", node, meta);
     const matchers = {
       group: this.matchGroup,
       char: this.matchChar,
@@ -79,7 +82,6 @@ class Matcher {
     this.index++;
     return {
       match: true,
-      flexible: false,
     };
   }
 
@@ -93,7 +95,6 @@ class Matcher {
     }
     return {
       match,
-      flexible: false,
     };
   }
 
@@ -108,19 +109,16 @@ class Matcher {
     }
     return {
       match,
-      flexible: false,
     };
   }
 
   matchRepetition({ min, max, value }, meta) {
     let count = 0;
     let lastRepeatMatched = true;
-    let effectiveMax = max;
-    if (meta) {
-      effectiveMax = meta.count - 1;
-    }
+    let effectiveMax = meta ? meta.count - 1 : max;
+
     let foo = 0;
-    console.log('rep', effectiveMax, meta, this.input.length);
+    console.log('rep <=', effectiveMax);
     while (lastRepeatMatched && !this.eof() && count !== effectiveMax) {
       if (++foo > 20) throw new Error('inf loop');
 
@@ -130,11 +128,15 @@ class Matcher {
       }
     }
 
-    return {
-      match: count >= min,
-      flexible: count > min,
-      meta: { count },
-    };
+    const flexible = count > min;
+    const result = { match: count >= min };
+
+    return flexible
+      ? {
+          ...result,
+          meta: { count },
+        }
+      : result;
   }
 
   matchAlternation({ values }) {
@@ -142,7 +144,6 @@ class Matcher {
     // TODO: should be flexible unless last value matched
     return {
       match,
-      flexible: false,
     };
   }
 
@@ -150,7 +151,8 @@ class Matcher {
     let allGood;
     let done = false;
     const metaMap = new Map();
-    const indexStateStack = [];
+    const indexStateStack = [this.index];
+    const trace = [];
 
     let i = 0;
     let baseIndex = 0; // All nodes below this index are inflexible.
@@ -161,22 +163,22 @@ class Matcher {
       const startIndex = this.index;
       const node = values[i];
       const isLast = i === values.length - 1;
-      const { match, meta, flexible } = this.processNode(node, metaMap.get(node));
-      console.log('\n',{ i, node, match, input: this.input, flexible, meta, isLast, baseIndex, indexStateStack });
+      const { match, meta } = this.processNode(node, metaMap.get(node));
+      trace.push(this.matchedInput);
 
       if (meta) {
         metaMap.set(node, meta);
       }
 
       if (match) {
-        if (i === baseIndex && !flexible) {
-          baseIndex++;
-        }
-
         if (isLast) {
           done = true;
           allGood = true;
         } else {
+          if (i === baseIndex && !meta) {
+            baseIndex++;
+          }
+
           i++;
           indexStateStack.push(startIndex);
         }
@@ -188,18 +190,21 @@ class Matcher {
           do {
             i--;
             this.index = indexStateStack.pop();
-          } while (!metaMap.has(values[i]))
+          } while (!metaMap.has(values[i]));
         }
       }
     }
 
+    console.log('group allGood', allGood);
     if (!allGood) {
       this.index = indexStateStack[0];
+      trace.push(this.matchedInput);
     }
+
+    console.log(trace.join('\n'));
 
     return {
       match: allGood,
-      flexible: false,
     };
   }
 }
