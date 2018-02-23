@@ -54,7 +54,7 @@ class Matcher {
   }
 
   processNode(node, meta) {
-    console.log('\nprocess', this.input || "''", node, meta);
+    // console.log('\nprocess', this.input || "''", node, meta);
     const matchers = {
       group: this.matchGroup,
       char: this.matchChar,
@@ -118,10 +118,9 @@ class Matcher {
     let effectiveMax = max;
     if (meta) {
       effectiveMax = meta.count - 1;
-      this.index--;
     }
     let foo = 0;
-    console.log(effectiveMax, meta, this.input.length);
+    console.log('rep', effectiveMax, meta, this.input.length);
     while (lastRepeatMatched && !this.eof() && count !== effectiveMax) {
       if (++foo > 20) throw new Error('inf loop');
 
@@ -151,18 +150,19 @@ class Matcher {
     let allGood;
     let done = false;
     const metaMap = new Map();
-    const indexStateStack = [this.index];
+    const indexStateStack = [];
 
     let i = 0;
     let baseIndex = 0; // All nodes below this index are inflexible.
     let foo = 0;
     while (!done) {
-      if (++foo > 20) throw new Error('inf loop');
+      if (++foo > 50) throw new Error('inf loop');
 
+      const startIndex = this.index;
       const node = values[i];
       const isLast = i === values.length - 1;
       const { match, meta, flexible } = this.processNode(node, metaMap.get(node));
-      console.log({ i, match, input: this.input, flexible, meta, isLast, baseIndex });
+      console.log('\n',{ i, node, match, input: this.input, flexible, meta, isLast, baseIndex, indexStateStack });
 
       if (meta) {
         metaMap.set(node, meta);
@@ -178,17 +178,17 @@ class Matcher {
           allGood = true;
         } else {
           i++;
-          indexStateStack.push(this.index);
+          indexStateStack.push(startIndex);
         }
       } else {
         if (baseIndex === i) {
           done = true;
           allGood = false;
         } else {
-          i--;
-          console.log('prepop', indexStateStack, this.index);
-          this.index = indexStateStack.pop();
-          console.log('postpop', indexStateStack, this.index);
+          do {
+            i--;
+            this.index = indexStateStack.pop();
+          } while (!metaMap.has(values[i]))
         }
       }
     }
