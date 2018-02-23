@@ -63,6 +63,7 @@ test(testMatch, 'a', 'a');
 test(testMatch, '!', '!');
 test(testMatch, '5', '5');
 test(testMatch, ' ', ' ');
+test(testMiss, 'A', 'a');
 test(testMiss, 'b', 'a');
 
 test(testMatch, 'abc', 'abc');
