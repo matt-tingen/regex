@@ -54,7 +54,7 @@ class Matcher {
   }
 
   processNode(node, meta) {
-    console.log('\nprocess', node, meta);
+    console.log('\nprocess', this.input || "''", node, meta);
     const matchers = {
       group: this.matchGroup,
       char: this.matchChar,
@@ -162,7 +162,7 @@ class Matcher {
       const node = values[i];
       const isLast = i === values.length - 1;
       const { match, meta, flexible } = this.processNode(node, metaMap.get(node));
-      console.log(i, match, flexible, meta);
+      console.log({ i, match, input: this.input, flexible, meta, isLast, baseIndex });
 
       if (meta) {
         metaMap.set(node, meta);
@@ -181,8 +181,6 @@ class Matcher {
           indexStateStack.push(this.index);
         }
       } else {
-        console.log(isLast, baseIndex, i);
-
         if (baseIndex === i) {
           done = true;
           allGood = false;
@@ -191,9 +189,6 @@ class Matcher {
           console.log('prepop', indexStateStack, this.index);
           this.index = indexStateStack.pop();
           console.log('postpop', indexStateStack, this.index);
-          // TODO NEXT: Need to also undo any of `this.index` that was incremented/consumed. Maybe
-          // make bookmarks for each node, store it in a map if the node is flexible. Map value
-          // would need to be a stack in case a node has to be backtracked to multiple times.
         }
       }
     }
