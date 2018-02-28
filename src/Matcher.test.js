@@ -50,6 +50,16 @@ const patterns = {
     ),
     ast.char('b'),
   ],
+  '(a+c)a+b': [
+    ast.group(ast.rep(1, Infinity, ast.char('a')), ast.char('c')),
+    ast.rep(1, Infinity, ast.char('a')),
+    ast.char('b'),
+  ],
+  '(a+c)?a+b': [
+    ast.rep(0, 1, ast.group(ast.rep(1, Infinity, ast.char('a')), ast.char('c'))),
+    ast.rep(1, Infinity, ast.char('a')),
+    ast.char('b'),
+  ],
 };
 
 function checkPattern(input, pattern) {
@@ -226,14 +236,13 @@ test('Croaks on invalid node', t => {
 test(testMatch, 'aa', 'a+a');
 test(testMatch, 'aa', 'a*aa');
 test(testMatch, 'aa', 'a+a+');
-test(testMatch, 'aab', '(a+c)?a+b')
-test(testMatch, 'ababbc', '(ab+)+(bc)+');
+test(testMatch, 'aab', '(a+c)?a+b');
+test.only(testMatch, 'ababbc', '(ab+)+(bc)+');
 test(testMatch, '1', '([0-9]*\\.)?[0-9]+');
 test(testMatch, '1.50', '([0-9]*\\.)?[0-9]+');
 test(testMatch, '.50', '([0-9]*\\.)?[0-9]+');
 test(testMatch, 'aaaaab', '(a+a+)+b');
-test(testMatch, 'a', 'a+a+');
+test(testMiss, 'a', 'a+a+');
 test(testMiss, '1.2.3', '([0-9]*\\.)?[0-9]+');
 test(testMiss, 'aaaaa', '(a+a+)+b');
-test(testMatch, 'aab', '(a+c)a+b')
-
+test(testMiss, 'aab', '(a+c)a+b');

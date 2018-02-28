@@ -113,28 +113,34 @@ class Matcher {
   }
 
   matchRepetition({ min, max, value }, meta) {
-    let count = 0;
-    let lastRepeatMatched = true;
+    let count;
     let effectiveMax = meta ? meta.count - 1 : max;
+    // Don't reuse meta.repeatMeta because any matches which previously had metadata, but don't on
+    // this run would falsely have their stale metadata in the array.
+    const instanceMetas = [];
 
     let foo = 0;
     console.log('rep <=', effectiveMax);
-    while (lastRepeatMatched && !this.eof() && count !== effectiveMax) {
+    for (count = 0; count < effectiveMax && !this.eof(); count++) {
       if (++foo > 20) throw new Error('inf loop');
+      const { match, meta: instanceMeta } = this.processNode(
+        value,
+        meta && meta.instanceMetas[count],
+      );
 
-      lastRepeatMatched = this.matchNode(value);
-      if (lastRepeatMatched) {
-        count++;
+      if (!match) {
+        break;
       }
+
+      instanceMetas[count] = instanceMeta;
     }
 
     const flexible = count > min;
     const result = { match: count >= min };
-
     return flexible
       ? {
           ...result,
-          meta: { count },
+          meta: { count, instanceMetas },
         }
       : result;
   }
@@ -147,10 +153,10 @@ class Matcher {
     };
   }
 
-  matchGroup({ values }) {
+  matchGroup({ values }, meta) {
     let allGood;
     let done = false;
-    const metaMap = new Map();
+    const metaMap = meta ? meta.map : new Map();
     const indexStateStack = [this.index];
     const trace = [];
 
@@ -187,6 +193,8 @@ class Matcher {
           done = true;
           allGood = false;
         } else {
+          // Backtrack to the most recect node which returned metadata, indicating that it can
+          // backtrack.
           do {
             i--;
             this.index = indexStateStack.pop();
@@ -205,6 +213,9 @@ class Matcher {
 
     return {
       match: allGood,
+      meta: {
+        map: metaMap,
+      },
     };
   }
 }
