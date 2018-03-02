@@ -135,7 +135,7 @@ class Matcher {
       instanceMetas[count] = instanceMeta;
     }
 
-    const flexible = count > min;
+    const flexible = count > min; // TODO Or any of it's children are flexible
     const result = { match: count >= min };
     return flexible
       ? {
@@ -214,7 +214,7 @@ class Matcher {
     return {
       match: allGood,
       meta: {
-        map: metaMap,
+        map: metaMap, // TODO only include meta if map is not empty
       },
     };
   }
