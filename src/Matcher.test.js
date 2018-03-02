@@ -38,6 +38,11 @@ const patterns = {
     ast.rep(1, Infinity, ast.group(ast.char('a'), ast.rep(1, Infinity, ast.char('b')))),
     ast.rep(1, Infinity, ast.group(ast.char('b'), ast.char('c'))),
   ],
+  '(a?)+ab': [
+    ast.rep(1, Infinity, ast.group(ast.rep(0, 1, ast.char('a')))),
+    ast.char('a'),
+    ast.char('b'),
+  ],
   '([0-9]*\\.)?[0-9]+': [
     ast.rep(0, 1, ast.group(ast.rep(0, Infinity, ast.range('0', '9')), ast.char('.'))),
     ast.rep(1, Infinity, ast.range('0', '9')),
@@ -238,6 +243,7 @@ test(testMatch, 'aa', 'a*aa');
 test(testMatch, 'aa', 'a+a+');
 test(testMatch, 'aab', '(a+c)?a+b');
 test.only(testMatch, 'ababbc', '(ab+)+(bc)+');
+test(testMatch, 'ab', '(a?)+ab');
 test(testMatch, '1', '([0-9]*\\.)?[0-9]+');
 test(testMatch, '1.50', '([0-9]*\\.)?[0-9]+');
 test(testMatch, '.50', '([0-9]*\\.)?[0-9]+');
