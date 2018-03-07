@@ -135,7 +135,7 @@ class Matcher {
       instanceMetas[count] = instanceMeta;
     }
 
-    const flexible = count > min; // TODO Or any of it's children are flexible
+    const flexible = count > min || instanceMetas.some(m => m);
     const result = { match: count >= min };
     return flexible
       ? {
@@ -147,7 +147,8 @@ class Matcher {
 
   matchAlternation({ values }) {
     const match = values.some(this.matchNode);
-    // TODO: should be flexible unless last value matched
+    // TODO: should be flexible unless last value matched. However this doesn't matter so long as
+    // the only alternations are character classes.
     return {
       match,
     };
@@ -174,6 +175,8 @@ class Matcher {
 
       if (meta) {
         metaMap.set(node, meta);
+      } else {
+        metaMap.delete(node);
       }
 
       if (match) {
@@ -211,12 +214,17 @@ class Matcher {
 
     console.log(trace.join('\n'));
 
-    return {
+    const result = {
       match: allGood,
-      meta: {
-        map: metaMap, // TODO only include meta if map is not empty
-      },
     };
+    return metaMap.size
+      ? {
+          ...result,
+          meta: {
+            map: metaMap,
+          },
+        }
+      : result;
   }
 }
 

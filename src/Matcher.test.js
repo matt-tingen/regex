@@ -34,6 +34,13 @@ const patterns = {
   'a+a': [ast.rep(1, Infinity, ast.char('a')), ast.char('a')],
   'a*aa': [ast.rep(0, Infinity, ast.char('a')), ...ast.str('aa')],
   'a+a+': [ast.rep(1, Infinity, ast.char('a')), ast.rep(1, Infinity, ast.char('a'))],
+  '(a?)+': [ast.rep(1, Infinity, ast.group(ast.rep(0, 1, ast.char('a'))))],
+  '(a?)+a': [ast.rep(1, Infinity, ast.group(ast.rep(0, 1, ast.char('a')))), ast.char('a')],
+  '(a+)ab': [ast.group(ast.rep(1, Infinity, ast.char('a'))), ...ast.str('ab')],
+  '(a+)+ab': [
+    ast.rep(1, Infinity, ast.group(ast.rep(1, Infinity, ast.char('a')))),
+    ...ast.str('ab'),
+  ],
   '(ab+)+(bc)+': [
     ast.rep(1, Infinity, ast.group(ast.char('a'), ast.rep(1, Infinity, ast.char('b')))),
     ast.rep(1, Infinity, ast.group(ast.char('b'), ast.char('c'))),
@@ -226,6 +233,8 @@ test(testMatch, 'ab', '(ab+)*');
 test(testMatch, 'abbb', '(ab+)*');
 test(testMatch, 'abbbab', '(ab+)*');
 test(testMatch, 'ababbbb', '(ab+)*');
+test(testMatch, 'a', '(a?)+');
+test.only(testMatch, '', '(a?)+');
 test(testMiss, 'aab', '(ab+)*');
 test(testMiss, 'aabb', '(ab+)*');
 
@@ -242,7 +251,10 @@ test(testMatch, 'aa', 'a+a');
 test(testMatch, 'aa', 'a*aa');
 test(testMatch, 'aa', 'a+a+');
 test(testMatch, 'aab', '(a+c)?a+b');
-test.only(testMatch, 'ababbc', '(ab+)+(bc)+');
+test(testMatch, 'a', '(a?)+a');
+test(testMatch, 'aab', '(a+)ab');
+test(testMatch, 'aab', '(a+)+ab');
+test(testMatch, 'ababbc', '(ab+)+(bc)+');
 test(testMatch, 'ab', '(a?)+ab');
 test(testMatch, '1', '([0-9]*\\.)?[0-9]+');
 test(testMatch, '1.50', '([0-9]*\\.)?[0-9]+');
