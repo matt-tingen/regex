@@ -1,7 +1,7 @@
 const test = require('ava');
 const sinon = require('sinon');
 const Matcher = require('./Matcher');
-const { ast } = require('./testUtil');
+const { ast, repeat } = require('./testUtil');
 
 const patterns = {
   a: [ast.char('a')],
@@ -107,6 +107,7 @@ test(testMiss, 'b', 'a*');
 
 test(testMatch, 'a', 'a+');
 test(testMatch, 'aaa', 'a+');
+test(testMatch, repeat('a', 200), 'a+');
 test(testMiss, '', 'a+');
 test(testMiss, 'b', 'a+');
 

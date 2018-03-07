@@ -9,6 +9,9 @@ const ast = {
   range: (from, to) => ({ type: 'range', from, to }),
 };
 
+const repeat = (str, n) => Array(n + 1).join(str);
+
 module.exports = {
   ast,
+  repeat,
 };
