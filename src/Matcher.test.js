@@ -198,7 +198,9 @@ test(testMiss, 'aabb', '(ab+)*');
 test('Croaks on invalid node', t => {
   const root = { type: 'invalid' };
   const matcher = new Matcher(root, 'test');
-  t.throws(matcher.match.bind(matcher));
+  sinon.spy(matcher, 'croak');
+  t.throws(() => matcher.match());
+  t.true(matcher.croak.calledOnce);
 });
 
 // Backtracking

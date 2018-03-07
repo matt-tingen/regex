@@ -11,6 +11,10 @@ class Matcher {
     return this.fullInput.slice(this.index);
   }
 
+  croak(msg) {
+    throw new Error(msg);
+  }
+
   eof() {
     return this.index === this.fullInput.length;
   }
