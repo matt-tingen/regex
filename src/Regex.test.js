@@ -1,4 +1,4 @@
-const test = require('ava').skip;
+const test = require('ava');
 const sinon = require('sinon');
 const Regex = require('./Regex');
 
