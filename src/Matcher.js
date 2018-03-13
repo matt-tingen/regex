@@ -49,10 +49,6 @@ class Matcher {
     return this.matchNode(this.ast) && this.eof();
   }
 
-  isOptional(node) {
-    return node.type === 'rep' && node.min === 0;
-  }
-
   matchNode(node, meta) {
     return this.processNode(node, meta).match;
   }
