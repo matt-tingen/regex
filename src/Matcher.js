@@ -113,7 +113,7 @@ class Matcher {
   }
 
   matchRepetition({ min, max, value }, meta) {
-    let count;
+    let count = 0;
     let effectiveMax = meta ? meta.count - 1 : max;
     // Don't reuse meta.repeatMeta because any matches which previously had metadata, but don't on
     // this run would falsely have their stale metadata in the array.
@@ -121,14 +121,22 @@ class Matcher {
 
     let foo = 0;
     console.log('rep <=', effectiveMax);
-    for (count = 0; count < effectiveMax && !this.eof(); count++) {
+    while (count < effectiveMax) {
       if (++foo > 20) throw new Error('inf loop');
+      const prevIndex = this.index;
       const { match, meta: instanceMeta } = this.processNode(
         value,
         meta && meta.instanceMetas[count],
       );
 
-      if (!match) {
+      if (match) {
+        count++;
+
+        // Zero-length matches would match an infinite number of times.
+        if (this.index === prevIndex) {
+          break;
+        }
+      } else {
         break;
       }
 

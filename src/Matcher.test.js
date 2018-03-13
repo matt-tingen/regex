@@ -234,7 +234,7 @@ test(testMatch, 'abbb', '(ab+)*');
 test(testMatch, 'abbbab', '(ab+)*');
 test(testMatch, 'ababbbb', '(ab+)*');
 test(testMatch, 'a', '(a?)+');
-test.only(testMatch, '', '(a?)+');
+test(testMatch, '', '(a?)+');
 test(testMiss, 'aab', '(ab+)*');
 test(testMiss, 'aabb', '(ab+)*');
 
